@@ -79,7 +79,8 @@
         <select id="tipo" onchange="updateInputs()">
             <option value="menor">Menor o igual</option>
             <option value="mayor">Mayor o igual</option>
-            <option value="diferencia">Diferencia entre Z2 y Z1</option>
+            <option value="diferencia">Entre Z2 - Z1</option>
+            <option value="fuera">Fuera Z1 - Z2</option>
         </select>
 
         <div id="inputZ" style="display: block;">
@@ -146,7 +147,7 @@
             const tipo = document.getElementById('tipo').value;
             let resultado = '';
 
-            if (tipo === 'diferencia') {
+            if (tipo === 'diferencia' || tipo === 'fuera') {
                 const valorZ1 = parseFloat(document.getElementById('valorZ1').value);
                 const valorZ2 = parseFloat(document.getElementById('valorZ2').value);
 
@@ -155,7 +156,14 @@
                 } else {
                     const probabilidadZ1 = getProbabilidad(valorZ1);
                     const probabilidadZ2 = getProbabilidad(valorZ2);
-                    resultado = `${(probabilidadZ2 - probabilidadZ1).toFixed(4)}`; // Redondeo a 4 cifras decimales
+                    const probabilidadEntre = probabilidadZ2 - probabilidadZ1;
+                    
+                    if (tipo === 'diferencia') {
+                        resultado = `${probabilidadEntre.toFixed(4)}`; // Redondeo a 4 cifras decimales
+                    } else {
+                        const probabilidadFuera = (1 - probabilidadEntre).toFixed(4);
+                        resultado = `${probabilidadFuera}`; // Resultado para "Fuera de Z1 y Z2"
+                    }
                 }
             } else {
                 const valorZ = parseFloat(document.getElementById('valorZ').value);
@@ -169,7 +177,7 @@
                         const complemento = (1 - probabilidad).toFixed(4); // Redondeo a 4 cifras decimales
                         resultado = `${complemento}`;
                     } else {
-                        resultado = `${probabilidad}`;
+                        resultado = `${probabilidad.toFixed(4)}`;
                     }
                 }
             }
@@ -190,7 +198,7 @@
             const inputZ = document.getElementById('inputZ');
             const inputZ1Z2 = document.getElementById('inputZ1Z2');
 
-            if (tipo === 'diferencia') {
+            if (tipo === 'diferencia' || tipo === 'fuera') {
                 inputZ.style.display = 'none';
                 inputZ1Z2.style.display = 'block';
             } else {
@@ -210,8 +218,10 @@
                 imageElement.src = 'img/menor.svg';
             } else if (tipo === 'mayor') {
                 imageElement.src = 'img/mayor.svg';
+            } else if (tipo === 'diferencia') {
+                imageElement.src = 'img/entre.svg';
             } else {
-                imageElement.src = 'img/entre.svg'; // Asegúrate de tener una imagen para la diferencia
+                imageElement.src = 'img/fuera.svg'; // Imagen para la opción "Fuera de Z1 y Z2"
             }
 
             imageElement.style.display = 'block';
