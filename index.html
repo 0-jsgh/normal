@@ -152,7 +152,7 @@
                 const valorZ2 = parseFloat(document.getElementById('valorZ2').value);
 
                 if (isNaN(valorZ1) || isNaN(valorZ2) || valorZ1 >= valorZ2 || valorZ1 < -3.59 || valorZ2 > 3.59) {
-                    resultado = 'Valores de Z1 y Z2 válidos (Z2 > Z1 y entre -3.59 y 3.59).';
+                    resultado = 'Z2 > Z1';
                 } else {
                     const probabilidadZ1 = getProbabilidad(valorZ1);
                     const probabilidadZ2 = getProbabilidad(valorZ2);
@@ -169,7 +169,7 @@
                 const valorZ = parseFloat(document.getElementById('valorZ').value);
 
                 if (isNaN(valorZ) || valorZ < -3.59 || valorZ > 3.59) {
-                    resultado = 'Valor de Z válido entre -3.59 a 3.59.';
+                    resultado = 'Valor no valido.';
                 } else {
                     const probabilidad = getProbabilidad(valorZ);
 
