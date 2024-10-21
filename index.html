@@ -14,77 +14,87 @@
             box-sizing: border-box;
             margin: 0; padding: 0;
         }
-label,input,button{
-    font-size: 0.5cm;
-    border:0px solid black;
-    display: block;
-}
+        label, input, button {
+            font-size: 0.5cm;
+            border: 0px solid black;
+            display: block;
+        }
 
-label{
-    margin: 0.2cm 0;
-}
+        label {
+            margin: 0.2cm 0;
+        }
 
-input{
-    border: 1px solid black;
-    width: 100%;
-    padding:0.2cm;
-}
+        input {
+            border: 1px solid black;
+            width: 100%;
+            padding: 0.2cm;
+        }
 
-button{
-    border: 1px solid black;
-    width: 50%;
-    margin: 0 auto;
-    margin-bottom: 0.4cm;
-    padding: 0.2cm;
-}
+        button {
+            border: 1px solid black;
+            width: 50%;
+            margin: 0 auto;
+            margin-bottom: 0.4cm;
+            padding: 0.2cm;
+        }
 
-button:hover{
-    border: 1px white black;
-    background: black;
-    color:white;
-}
+        button:hover {
+            border: 1px white black;
+            background: black;
+            color: white;
+        }
 
-select{
-    width: 100%;
-    background-color: white;
-    padding: 0.2cm;
-    font-size: 0.5cm;
-    margin-bottom: 0.4cm;
-}
+        select {
+            width: 100%;
+            background-color: white;
+            padding: 0.2cm;
+            font-size: 0.5cm;
+            margin-bottom: 0.4cm;
+        }
 
-.image-container img{
-    margin: 0 auto;
-    max-width: 90%;
-    margin-bottom: 0.4cm;
-}
+        .image-container img {
+            margin: 0 auto;
+            max-width: 90%;
+            margin: 0.4cm auto;
+        }
 
-#resultado {
-    border: 1px solid black;
-    min-height: 1cm;
-    padding: 0.25cm 1cm;
-    font-size: 0.5cm;
-    background: white;
-}
-.container {
-    padding: 1cm;
-}
+        #resultado {
+            border: 1px solid black;
+            min-height: 1cm;
+            padding: 0.25cm 1cm;
+            font-size: 0.5cm;
+            background: white;
+        }
+
+        .container {
+            padding: 1cm;
+        }
 
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Distribución Normal</h2>
-        <label for="valorZ">Z (0.00 a 3.59):</label>
-        <input type="number" id="valorZ" step="0.01" placeholder="0.00" min="0" max="3.59">
-    
         <label for="tipo">Seleccionar:</label>
-        <select id="tipo" onchange="updateImage()">
+        <select id="tipo" onchange="updateInputs()">
             <option value="menor">Menor o igual</option>
             <option value="mayor">Mayor o igual</option>
+            <option value="diferencia">Diferencia entre Z2 y Z1</option>
         </select>
-        
-    <div class="image-container"><img id="conversionImage" src="" alt="Imagen de conversión" style="display: none;"></div>
 
+        <div id="inputZ" style="display: block;">
+            <label for="valorZ">Z (-3.59 a 3.59):</label>
+            <input type="number" id="valorZ" step="0.01" placeholder="0.00" min="-3.59" max="3.59">
+        </div>
+
+        <div id="inputZ1Z2" style="display: none;">
+            <label for="valorZ1">Z1 (-3.59 a 3.59):</label>
+            <input type="number" id="valorZ1" step="0.01" placeholder="Z1" min="-3.59" max="3.59">
+            <label for="valorZ2">Z2 (-3.59 a 3.59):</label>
+            <input type="number" id="valorZ2" step="0.01" placeholder="Z2" min="-3.59" max="3.59">
+        </div>
+
+        <div class="image-container"><img id="conversionImage" src="" alt="Imagen de conversión" style="display: none;"></div>
 
         <button onclick="calcular()">Calcular</button>
 
@@ -132,47 +142,83 @@ select{
             '3.5': [0.9998, 0.9998, 0.9998, 0.9998, 0.9998, 0.9998, 0.9998, 0.9998, 0.9998, 0.9998]
         };
 
-        // Función para calcular el valor de la tabla según Z
         function calcular() {
-            const valorZ = parseFloat(document.getElementById('valorZ').value);
             const tipo = document.getElementById('tipo').value;
-
             let resultado = '';
 
-            if (isNaN(valorZ) || valorZ < 0 || valorZ > 3.59) {
-                resultado = 'Valor de Z válido entre 0.00 a 3.59.';
-            } else {
-                const fila = Math.floor(valorZ * 10) / 10; // Parte entera (0.0, 0.1, ..., 3.5)
-                const columna = Math.round((valorZ * 100) % 10); // Parte decimal (0.00 a 0.09)
+            if (tipo === 'diferencia') {
+                const valorZ1 = parseFloat(document.getElementById('valorZ1').value);
+                const valorZ2 = parseFloat(document.getElementById('valorZ2').value);
 
-                const probabilidad = tablaNormal[fila.toFixed(1)][columna];
-
-                if (tipo === 'mayor') {
-                    const complemento = (1 - probabilidad).toFixed(4); // Redondeo a 4 cifras decimales
-                    resultado = `${complemento}`;
+                if (isNaN(valorZ1) || isNaN(valorZ2) || valorZ1 >= valorZ2 || valorZ1 < -3.59 || valorZ2 > 3.59) {
+                    resultado = 'Valores de Z1 y Z2 válidos (Z2 > Z1 y entre -3.59 y 3.59).';
                 } else {
-                    resultado = `${probabilidad}`;
+                    const probabilidadZ1 = getProbabilidad(valorZ1);
+                    const probabilidadZ2 = getProbabilidad(valorZ2);
+                    resultado = `${(probabilidadZ2 - probabilidadZ1).toFixed(4)}`; // Redondeo a 4 cifras decimales
+                }
+            } else {
+                const valorZ = parseFloat(document.getElementById('valorZ').value);
+
+                if (isNaN(valorZ) || valorZ < -3.59 || valorZ > 3.59) {
+                    resultado = 'Valor de Z válido entre -3.59 a 3.59.';
+                } else {
+                    const probabilidad = getProbabilidad(valorZ);
+
+                    if (tipo === 'mayor') {
+                        const complemento = (1 - probabilidad).toFixed(4); // Redondeo a 4 cifras decimales
+                        resultado = `${complemento}`;
+                    } else {
+                        resultado = `${probabilidad}`;
+                    }
                 }
             }
 
             document.getElementById('resultado').innerHTML = resultado;
         }
-    // Función para actualizar la imagen de la conversión
-function updateImage() {
-    const tipo = document.getElementById('tipo').value;
-    const imageElement = document.getElementById('conversionImage');
 
-    if (tipo === 'menor') {
-        imageElement.src = 'img/menor.svg';
-    } else {
-        imageElement.src = 'img/mayor.svg';
-    }
+        function getProbabilidad(valorZ) {
+            const fila = Math.floor(Math.abs(valorZ) * 10) / 10; // Parte entera (0.0, 0.1, ..., 3.5)
+            const columna = Math.round((Math.abs(valorZ) * 100) % 10); // Parte decimal (0.00 a 0.09)
+            const probabilidad = tablaNormal[fila.toFixed(1)][columna];
 
-    imageElement.style.display = 'block';
-}
+            return valorZ < 0 ? (1 - probabilidad) : probabilidad;
+        }
 
-// Inicializar la imagen al cargar la página
-updateImage();
+        function updateInputs() {
+            const tipo = document.getElementById('tipo').value;
+            const inputZ = document.getElementById('inputZ');
+            const inputZ1Z2 = document.getElementById('inputZ1Z2');
+
+            if (tipo === 'diferencia') {
+                inputZ.style.display = 'none';
+                inputZ1Z2.style.display = 'block';
+            } else {
+                inputZ.style.display = 'block';
+                inputZ1Z2.style.display = 'none';
+            }
+
+            updateImage();
+        }
+
+        // Función para actualizar la imagen de la conversión
+        function updateImage() {
+            const tipo = document.getElementById('tipo').value;
+            const imageElement = document.getElementById('conversionImage');
+
+            if (tipo === 'menor') {
+                imageElement.src = 'img/menor.svg';
+            } else if (tipo === 'mayor') {
+                imageElement.src = 'img/mayor.svg';
+            } else {
+                imageElement.src = 'img/entre.svg'; // Asegúrate de tener una imagen para la diferencia
+            }
+
+            imageElement.style.display = 'block';
+        }
+
+        // Inicializar la imagen al cargar la página
+        updateImage();
     </script>
 </body>
 </html>
